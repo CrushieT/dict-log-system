@@ -30,7 +30,7 @@ It’s lightweight, fast, and can run **locally without complex setup**.
 ```bash
 git clone https://github.com/CrushieT/dict-log-system.git
 cd dict-log-system
-
+```
 
 
 ### Prerequisites
