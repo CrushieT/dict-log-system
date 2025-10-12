@@ -110,18 +110,19 @@ Create a file named set-env.ps1 in root directory:
 
 Run the script terminal:
 
-   .\set-env.ps1
+    ```.\set-env.ps1 ```
 
 Step 5 — Configure application.properties
 -----------------------------------------
 Make sure Spring Boot reads the environment variables:
 
-   
-   server.ssl.key-store=classpath:keystore.p12
-   server.ssl.key-store-password=${SSL_KEYSTORE_PASSWORD}
-   server.ssl.key-alias=${SSL_KEYSTORE_ALIAS}
-   server.ssl.key-store-type=PKCS12
-   server.port=8443
+   ```
+    server.ssl.enabled=true
+    server.ssl.key-store=classpath:keystore.p12
+    server.ssl.key-store-password=${SSL_KEYSTORE_PASSWORD}
+    server.ssl.key-store-type=PKCS12
+    server.ssl.key-alias=${SSL_KEYSTORE_ALIAS}
+   ```
 
 Step 6 — Run the application
 ----------------------------
