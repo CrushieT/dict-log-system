@@ -1,0 +1,48 @@
+    body {
+      background: linear-gradient(180deg, #f3f4f8, #e0e4ef);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .card {
+      position: relative;
+      width: 380px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .dropdown-toggle::after {
+      display: none;
+    }
+
+    .dropdown {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+    }
+
+    .btn-menu {
+      background: none;
+      border: none;
+      color: orange;
+      font-size: 28px;
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      min-width: 160px;
+    }
+
+    .logo {
+      width: 200px;
+      margin-top: 30px;
+    }
+
+    

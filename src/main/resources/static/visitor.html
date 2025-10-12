@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>DICT Visitor Log</title>
+        
+        <link rel="stylesheet" href="css/visitor.css"> 
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-icons.css" rel="stylesheet">
+        <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" >
+    </head>
+
+    <body>
+        <div class="visitor-card text-center">
+        <div class="close-btn" onclick="closeCard()">&times;</div>
+
+        <p class="text-muted text-start mb-2">26/1000</p>
+        <video id="camera" autoplay playsinline></video>
+
+        <button id="captureBtn" class="btn btn-outline-secondary w-100 my-2">
+        <i class="bi bi-camera-fill"></i> Capture
+        </button>
+
+        <div class="row g-2 mb-3">
+        <div class="col-md-5">
+            <input type="text" class="form-control" placeholder="First Name">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" placeholder="MI">
+        </div>
+        <div class="col-md-5">
+            <input type="text" class="form-control" placeholder="Last Name">
+        </div>
+        </div>
+
+        <select class="form-select mb-3">
+        <option selected disabled>Purpose</option>
+        <option>IBPLS technical assistance</option>
+        <option>FW4A technical assistance</option>
+        <option>E-Gov service assistance</option>
+        <option>Service Request</option>
+        <option>Partnership Proposal</option>
+        <option>Courtesy Call</option>
+        <option>Letter Delivery</option>
+        <option>Parcel Delivery</option>
+        <option>Project Related Inquiries</option>
+        <option>Others</option>
+        </select>
+
+            <button class="btn btn-primary w-100">Submit</button>
+        </div>
+
+        <script src="js/visitor.js"></script> 
+        <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+    
+    </body>
+
+</html>
