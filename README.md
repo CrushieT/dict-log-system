@@ -25,3 +25,8 @@ It’s lightweight, fast, and can run **locally without complex setup**.
 | ORM | Spring Data JPA + Hibernate |
 | API Testing | Postman |
 | Build Tool | Maven |
+
+### Clone the repository
+```bash
+git clone https://github.com/CrushieT/dict-log-system.git
+cd dict-log-system

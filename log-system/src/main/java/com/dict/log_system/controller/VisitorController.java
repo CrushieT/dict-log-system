@@ -8,7 +8,7 @@ import com.dict.log_system.repository.VisitorRepository;
 
 
 @RestController
-@RequestMapping("/visitors")
+@RequestMapping("/api/visitors")
 public class VisitorController {
 
     private final VisitorRepository visitorRepository;
