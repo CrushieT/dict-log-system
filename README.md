@@ -110,7 +110,9 @@ Create a file named set-env.ps1 in root directory:
 
 Run the script terminal:
 
-    ```.\set-env.ps1 ```
+   
+    .\set-env.ps1 
+    
 
 Step 5 — Configure application.properties
 -----------------------------------------
