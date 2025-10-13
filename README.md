@@ -135,6 +135,6 @@ After setting up environment variables, start the app:
 Open your browser at:
    https://localhost:8080
 
-Both should now be trusted without SSL warnings.
+
 
 
