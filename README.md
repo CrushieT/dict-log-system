@@ -53,6 +53,7 @@ Step 1 — Install mkcert and create a local CA
    mkcert -install
 
 2. Generate a certificate for localhost, 127.0.0.1, and your LAN IP:
+
    mkcert localhost 127.0.0.1 
 
    This will produce:
@@ -63,7 +64,7 @@ Step 2 — Convert PEM to PKCS12 keystore
 ---------------------------------------
 Use OpenSSL to create a .p12 keystore for Spring Boot:
 
-   openssl pkcs12 -export -in localhost+2.pem -inkey localhost+2-key.pem -out keystore.p12 -name dictlog -password pass:dict123
+   openssl pkcs12 -export -in localhost+1.pem -inkey localhost+1-key.pem -out keystore.p12 -name dictlog -password pass:dict123
 
 - Alias: dictlog
 - Password: dict123
