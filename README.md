@@ -89,31 +89,7 @@ Create a file named .env in root directory:
 
     # Alias in the keystore
     SSL_KEYSTORE_ALIAS=dictlog
-
-
-Create a file named set-env.ps1 in root directory:
-
-    # Load environment variables from .env
-    Get-Content .env | ForEach-Object {
-        # Skip empty lines and comments
-        if ($_ -and $_ -notmatch '^\s*#') {
-            $pair = $_ -split "="
-            if ($pair.Length -eq 2) {
-                $name = $pair[0].Trim()
-                $value = $pair[1].Trim()
-                # Set environment variable for current session
-                Set-Item -Path "Env:$name" -Value $value
-            }
-        }
-    }
-    Write-Host "Environment variables loaded."
-
-
-Run the script terminal:
-
-   
-    .\set-env.ps1 
-    
+        
 
 Step 5 — Configure application.properties
 -----------------------------------------

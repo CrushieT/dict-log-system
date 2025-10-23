@@ -16,12 +16,13 @@
   <!-- LOGIN CARD -->
     <div class="card shadow-lg p-4 text-center" style="width: 350px;">
         <img src="img/dict-logo.png" alt="DICT Logo" class="mx-auto mb-3" width="100" />
-        <div id="errorAlert" class="alert alert-danger py-2" style="display: none;">
-            Incorrect username or password
+        <div id="loginError" class="alert alert-danger py-2" style="display: none;">
+            Incorrect email or password
         </div>
         <form id="loginForm">
-            <input type="text" class="form-control mb-2" placeholder="Username" required />
-            <input type="password" class="form-control mb-3" placeholder="Password" required />
+            <input type="text" id="emailLogin" class="form-control mb-2" placeholder="Email" required />
+            <input type="password" id="passwordLogin" class="form-control mb-3" placeholder="Password" required />
+
             <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary w-50 me-2">Login</button>
             <button type="button" class="btn btn-secondary w-50" id="cancelBtn" onclick="window.location.href='index.html'">Cancel</button>

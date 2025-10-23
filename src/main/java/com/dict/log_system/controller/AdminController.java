@@ -38,9 +38,9 @@ public class AdminController {
     public Admin updateAdmin(@PathVariable Long id, @RequestBody Admin adminDetails) {
         Admin admin = adminRepository.findById(id).orElse(null);
         if (admin != null) {
-            admin.setFirst_name(adminDetails.getFirst_name());
-            admin.setMiddle_initial(adminDetails.getMiddle_initial());
-            admin.setLast_name(adminDetails.getLast_name());
+            admin.setFirstName(adminDetails.getFirstName());
+            admin.setMiddleInitial(adminDetails.getMiddleInitial());
+            admin.setLastName(adminDetails.getLastName());
             admin.setBirthday(adminDetails.getBirthday());
             admin.setSex(adminDetails.getSex());
             admin.setEmail(adminDetails.getEmail());

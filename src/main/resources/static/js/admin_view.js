@@ -95,3 +95,17 @@ const serviceChart = new Chart(ctx, {
     scales: { y: { beginAtZero: true } }
     }
 });
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  const response = await fetch("/api/logout", {
+    method: "POST",
+    credentials: "include"
+  });
+
+  if (response.ok) {
+    // Clear any local data and redirect to login page
+    window.location.href = "index.html";
+  } else {
+    alert("Logout failed!");
+  }
+});
