@@ -5,9 +5,21 @@ body {
   justify-content: center;
   align-items: center;
 }
+.camera-feed {
+    width: 320px;       /* same for video and captured image */
+    height: 240px;      /* fixed height to match aspect ratio */
+    object-fit: cover;  /* crop to fill */
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+img.camera-feed {
+    display: block;
+}
+
 
 .visitor-card {
-  width: 420px;
+  width: 520px;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   position: relative;
@@ -45,4 +57,14 @@ img {
   height: 240px;
   object-fit: cover; /* crop to fit */
   border-radius: 10px;
+}
+
+.was-validated .form-control:invalid,
+.was-validated .form-select:invalid {
+    border-color: #dc3545;
+}
+
+.was-validated .form-control:valid,
+.was-validated .form-select:valid {
+    border-color: #28a745;
 }

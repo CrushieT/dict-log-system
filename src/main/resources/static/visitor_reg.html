@@ -13,44 +13,61 @@
 
     <body>
         <div class="visitor-card text-center">
-        <div class="close-btn" onclick="window.location.href='index.html'">&times;</div>
+            <div class="close-btn" onclick="window.location.href='index.html'">&times;</div>
+
+             <p class="text-muted text-start mb-2">26/1000</p>
+
+            <!-- Camera feed -->
+            <video id="cameraVideo" class="camera-feed" autoplay playsinline></video>
+            <img id="capturedImage" class="camera-feed d-none">
 
 
+            <!-- Buttons -->
+            <div class="d-grid gap-2">
+                <button id="captureBtn" class="btn btn-outline-secondary">
+                    <i class="bi bi-camera-fill"></i> Capture
+                </button>
+                <button id="recaptureBtn" class="btn btn-outline-warning d-none">
+                    <i class="bi bi-arrow-clockwise"></i> Recapture
+                </button>
+            </div>
+        
 
-        <p class="text-muted text-start mb-2">26/1000</p>
-        <video id="camera" autoplay playsinline></video>
+            <form id="visitorForm" novalidate>
+                <div class="row g-2 mb-3">
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" placeholder="First Name" name="firstName" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" placeholder="MI" name="mi" required pattern="^[A-Za-z]$" maxlength="1">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" placeholder="Last Name" name="lastName" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
 
-        <button id="captureBtn" class="btn btn-outline-secondary w-100 my-2">
-        <i class="bi bi-camera-fill"></i> Capture
-        </button>
+                <select id="purposeSelect" class="form-select mb-3" name="purpose" required>
+                    <option value="" selected disabled>Purpose</option>
+                    <option>IBPLS technical assistance</option>
+                    <option>FW4A technical assistance</option>
+                    <option>E-Gov service assistance</option>
+                    <option>Service Request</option>
+                    <option>Partnership Proposal</option>
+                    <option>Courtesy Call</option>
+                    <option>Letter Delivery</option>
+                    <option>Parcel Delivery</option>
+                    <option>Project Related Inquiries</option>
+                    <option value="Others">Others</option>
+                </select>
+                <div class="invalid-feedback"></div>
 
-        <div class="row g-2 mb-3">
-        <div class="col-md-5">
-            <input type="text" class="form-control" placeholder="First Name">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="MI">
-        </div>
-        <div class="col-md-5">
-            <input type="text" class="form-control" placeholder="Last Name">
-        </div>
-        </div>
+                <input id="purposeInput" type="text" class="form-control mb-3 d-none" placeholder="Type your purpose..." name="otherPurpose" />
 
-        <select class="form-select mb-3">
-        <option selected disabled>Purpose</option>
-        <option>IBPLS technical assistance</option>
-        <option>FW4A technical assistance</option>
-        <option>E-Gov service assistance</option>
-        <option>Service Request</option>
-        <option>Partnership Proposal</option>
-        <option>Courtesy Call</option>
-        <option>Letter Delivery</option>
-        <option>Parcel Delivery</option>
-        <option>Project Related Inquiries</option>
-        <option>Others</option>
-        </select>
-
-            <button class="btn btn-primary w-100">Submit</button>
+                <button type="submit" class="btn btn-primary w-100">Submit</button>
+            </form>
         </div>
 
         <script src="js/visitor_reg.js"></script> 

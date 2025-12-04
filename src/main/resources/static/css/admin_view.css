@@ -27,3 +27,10 @@ img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; }
 .table-container { max-height: 400px; overflow-y: auto; border-radius: 10px; background: white; }
 .analytics { margin-top: 40px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 .chart-container { width: 100%; max-width: 600px; margin: auto; }
+
+.table-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}

@@ -46,10 +46,11 @@ public class SecurityConfig {
             return User.builder()
                     .username(admin.getEmail())
                     .password(admin.getPassword())
-                    .roles("ADMIN")
+                    .roles(admin.getRole())  // ✅ USE ROLE FROM DATABASE
                     .build();
         };
     }
+
 
     // ✅ Authentication provider
     @Bean
@@ -72,7 +73,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/register", "/api/verify", "/api/login").permitAll()
+                .requestMatchers("/api/register", "/api/verify", "/api/login", "/api/visitor").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/assets/**").permitAll()
                 .requestMatchers("/index.html", "/admin_reg.html", "/visitor_reg.html").permitAll()
                 .requestMatchers("/api/admin/**", "/admin_view.html").hasRole("ADMIN")
