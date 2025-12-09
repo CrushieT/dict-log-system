@@ -19,6 +19,7 @@ public class RedirectIfLoggedInFilter extends OncePerRequestFilter {
     private static final List<String> BLOCKED_WHEN_LOGGED_IN = List.of(
         "/index.html",
         "/admin_reg.html",
+        "/super_reg.html",
         "/visitor_reg.html"
     );
 

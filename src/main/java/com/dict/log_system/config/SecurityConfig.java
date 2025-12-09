@@ -75,7 +75,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/register", "/api/verify", "/api/login", "/api/visitor").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/assets/**", "/opencv/**", "/models/**").permitAll()
-                .requestMatchers("/index.html", "/admin_reg.html", "/visitor_reg.html", "/haarcascade_frontalface_default.xml").permitAll()
+                .requestMatchers("/index.html", "/admin_reg.html", "/visitor_reg.html", "/super_reg.html","/haarcascade_frontalface_default.xml").permitAll()
                 .requestMatchers("/api/admin/**", "/admin_view.html").hasRole("ADMIN")
                 .requestMatchers("/api/superuser/**", "/super_view.html").hasRole("SUPERUSER")
 
