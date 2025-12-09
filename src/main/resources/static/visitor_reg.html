@@ -15,10 +15,12 @@
         <div class="visitor-card text-center">
             <div class="close-btn" onclick="window.location.href='index.html'">&times;</div>
 
-             <p class="text-muted text-start mb-2">26/1000</p>
+             <!-- <p class="text-muted text-start mb-2">26/1000</p> -->
+              <p id="status"> hello</p>
 
             <!-- Camera feed -->
             <video id="cameraVideo" class="camera-feed" autoplay playsinline></video>
+            <canvas id="hiddenCanvas" class="d-none"></canvas>
             <img id="capturedImage" class="camera-feed d-none">
 
 
@@ -69,9 +71,11 @@
                 <button type="submit" class="btn btn-primary w-100">Submit</button>
             </form>
         </div>
-
+        
         <script src="js/visitor_reg.js"></script> 
         <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+        <script async src="opencv/opencv.js" onload="onOpenCvReady()"></script>
+        
     
     </body>
 

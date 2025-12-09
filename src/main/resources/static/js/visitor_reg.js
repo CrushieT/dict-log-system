@@ -1,77 +1,189 @@
 
-const cameraVideo = document.getElementById('cameraVideo');
-const capturedImage = document.getElementById('capturedImage');
-const captureBtn = document.getElementById('captureBtn');
-const recaptureBtn = document.getElementById('recaptureBtn');
+let cvReady = false;
+let faceCascade;
+
+// Called only after <script src="opencv.js" onload="onOpenCvReady()">
+function onOpenCvReady() {
+    cv['onRuntimeInitialized'] = async () => {
+        cvReady = true;
+        console.log("OpenCV is ready.");
+
+        await initFaceDetection();    // Wait for cascade to load
+        console.log("Cascade loaded.");
+
+        startCamera();                // Start camera AFTER cascade
+    };
+}
+
+function initFaceDetection() {
+    // Load cascade from new folder
+    const cascadeFile = "models/haarcascade_frontalface_default.xml";
+
+    return fetch(cascadeFile)
+        .then(res => res.arrayBuffer())
+        .then(buf => {
+            // Create virtual file in OpenCV's filesystem
+            cv.FS_createDataFile("/", "haarcascade_frontalface_default.xml", new Uint8Array(buf), true, false);
+            faceCascade = new cv.CascadeClassifier();
+            faceCascade.load("haarcascade_frontalface_default.xml"); // always load from root "/"
+            console.log("Cascade loaded.");
+        });
+}
+
+// ---------------------------
+// CAMERA + FACE DETECTION
+// ---------------------------
+
+const video = document.getElementById("cameraVideo");
+const capturedImage = document.getElementById("capturedImage");
+const hiddenCanvas = document.getElementById("hiddenCanvas");
+const statusText = document.getElementById("status");
+
+const captureBtn = document.getElementById("captureBtn");
+const recaptureBtn = document.getElementById("recaptureBtn");
+
 let stream = null;
+let detectInterval = null;
 
 async function startCamera() {
-  try {
-      if (stream) stream.getTracks().forEach(track => track.stop());
-      stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      cameraVideo.srcObject = stream;
-  } catch (err) {
-      console.warn("Camera access denied or unavailable:", err.message);
-  }
+    if (!cvReady || !faceCascade) {
+        console.log("Waiting for OpenCV...");
+        return;
+    }
+
+    if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+    }
+
+    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+
+    video.onloadedmetadata = () => {
+        video.play();
+        startDetectionLoop();
+    };
 }
 
-// Capture
-captureBtn.addEventListener('click', () => {
-  if (!stream) return;
+function startDetectionLoop() {
+    if (detectInterval) clearInterval(detectInterval);
 
-  const canvas = document.createElement('canvas');
-  // Match canvas size to video element size
-  canvas.width = cameraVideo.videoWidth;
-  canvas.height = cameraVideo.videoHeight;
-  canvas.getContext('2d').drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
+    hiddenCanvas.width = video.videoWidth;
+    hiddenCanvas.height = video.videoHeight;
 
-  capturedImage.src = canvas.toDataURL('image/png');
+    const ctx = hiddenCanvas.getContext("2d");
 
-  // Hide video, show captured image
-  cameraVideo.classList.add('d-none');
-  capturedImage.classList.remove('d-none');
+    detectInterval = setInterval(() => {
+        ctx.drawImage(video, 0, 0);
 
-  // Stop camera stream
-  stream.getTracks().forEach(track => track.stop());
+        const frame = cv.imread(hiddenCanvas);
+        const gray = new cv.Mat();
+        cv.cvtColor(frame, gray, cv.COLOR_RGBA2GRAY, 0);
 
-  captureBtn.classList.add('d-none');
-  recaptureBtn.classList.remove('d-none');
-});
+        const faces = new cv.RectVector();
+        faceCascade.detectMultiScale(gray, faces, 1.1, 3, 0);
 
-// Recapture
-recaptureBtn.addEventListener('click', async () => {
-  capturedImage.classList.add('d-none');
-  cameraVideo.classList.remove('d-none');
-  captureBtn.classList.remove('d-none');
-  recaptureBtn.classList.add('d-none');
+        // Calculate mean brightness for "too dark" detection
+        const meanBrightness = cv.mean(gray)[0];
 
-  await startCamera();
-});
+        // ---------------------------
+        // STATUS LOGIC
+        // ---------------------------
+        if (faces.size() === 0) {
+            statusText.innerHTML = "No face detected ✗";
+        } else if (faces.size() > 3) { // Too many people threshold
+            statusText.innerHTML = "Too many people!";
+        } else if (meanBrightness < 50) { // Too dark threshold
+            statusText.innerHTML = "Too dark!";
+        } else {
+            statusText.innerHTML = "Face detected ✓";
+        }
 
-// Initialize camera
-startCamera();
-
-
-// Stop camera and close card
-function closeCard() {
-  const stream = camera.srcObject;
-  if (stream) stream.getTracks().forEach(track => track.stop());
-  document.querySelector('.visitor-card').style.display = 'none';
+        frame.delete();
+        gray.delete();
+        faces.delete();
+    }, 150);
 }
 
-// Capture snapshot
-captureBtn.addEventListener('click', () => {
-  const canvas = document.createElement('canvas');
-  canvas.width = camera.videoWidth;
-  canvas.height = camera.videoHeight;
-  const ctx = canvas.getContext('2d'); 
-  ctx.drawImage(camera, 0, 0, canvas.width, canvas.height);
-  const image = canvas.toDataURL('image/png');
-  alert("Photo captured! (Base64 stored in variable)");
-  console.log(image);
+// ---------------------------
+// CAPTURE BUTTON
+// ---------------------------
+
+captureBtn.addEventListener("click", () => {
+    const ctx = hiddenCanvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
+
+    const frame = cv.imread(hiddenCanvas);
+    const gray = new cv.Mat();
+    cv.cvtColor(frame, gray, cv.COLOR_RGBA2GRAY, 0);
+
+    const faces = new cv.RectVector();
+    faceCascade.detectMultiScale(gray, faces, 1.1, 3, 0);
+
+    const meanBrightness = cv.mean(gray)[0];
+
+    if (faces.size() === 0) {
+        statusText.innerHTML = "❌ Cannot capture — No face detected.";
+        frame.delete();
+        gray.delete();
+        faces.delete();
+        return;
+    }
+
+    if (faces.size() > 2) {
+        statusText.innerHTML = "❌ Cannot capture — Too many people.";
+        frame.delete();
+        gray.delete();
+        faces.delete();
+        return;
+    }
+
+    if (meanBrightness < 30) {
+        statusText.innerHTML = "❌ Cannot capture — Too dark.";
+        frame.delete();
+        gray.delete();
+        faces.delete();
+        return;
+    }
+
+    // Capture allowed
+    capturedImage.src = hiddenCanvas.toDataURL("image/png");
+
+    capturedImage.style.width = `${video.clientWidth}px`;
+    capturedImage.style.height = `${video.clientHeight}px`;
+    capturedImage.style.objectFit = "cover";
+    capturedImage.style.display = "block";
+    capturedImage.style.margin = "0 auto";
+
+    capturedImage.classList.remove("d-none");
+    video.classList.add("d-none");
+
+    captureBtn.classList.add("d-none");
+    recaptureBtn.classList.remove("d-none");
+
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    if (detectInterval) clearInterval(detectInterval);
+
+    frame.delete();
+    gray.delete();
+    faces.delete();
 });
 
-startCamera();
+// ---------------------------
+// RECAPTURE
+// ---------------------------
+
+recaptureBtn.addEventListener("click", () => {
+    capturedImage.classList.add("d-none");
+    video.classList.remove("d-none");
+
+    captureBtn.classList.remove("d-none");
+    recaptureBtn.classList.add("d-none");
+
+    startCamera();
+});
+
+
+/////////////////////////////////
 
 
 const visitorForm = document.getElementById('visitorForm');
