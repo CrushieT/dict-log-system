@@ -1,0 +1,204 @@
+let logs = []; // global array to keep current visitors
+
+async function loadVisitors() {
+    const response = await fetch("/api/admin/visitor");
+    logs = await response.json(); // store in global array
+    
+    renderLogs(logs);
+}
+
+window.onload = loadVisitors;
+
+function renderLogs(data) {
+    const tbody = document.getElementById('logsBody');
+    tbody.innerHTML = '';
+
+    data.forEach(visitor => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${visitor.id}</td>
+            <td><img src="https://localhost:8443/images/${visitor.photo}" alt="" class="table-img"></td>
+            <td>${visitor.first_name}</td>
+            <td>${visitor.middle_initial}</td>
+            <td>${visitor.last_name}</td>
+            <td>${visitor.purpose}</td>
+            <td>${visitor.timestamp.replace('T', ' ')}</td>
+            <td><button class="action-btn" data-id="${visitor.id}">Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+document.addEventListener("click", async function (e) {
+    if (e.target.classList.contains("action-btn")) {
+        const id = e.target.dataset.id;
+
+        const confirmDelete = confirm("Are you sure you want to delete this visitor log?");
+        if (!confirmDelete) return;
+
+        try {
+            const response = await fetch(`/api/admin/visitor/${id}`, { method: 'DELETE' });
+
+            if (response.ok) {
+                // Remove from global logs array
+                const index = logs.findIndex(l => l.id == id);
+                if (index !== -1) logs.splice(index, 1);
+
+                // Re-render table using updated logs
+                renderLogs(logs);
+
+                alert("Visitor deleted successfully");
+            } else {
+                const errMsg = await response.text();
+                alert("Error deleting visitor: " + errMsg);
+            }
+        } catch (error) {
+            console.error("Delete error:", error);
+            alert("Error deleting visitor. Check console for details.");
+        }
+    }
+});
+
+
+
+
+document.getElementById('searchInput').addEventListener('input', e => {
+    const search = e.target.value.toLowerCase();
+    const filtered = logs.filter(l =>
+    l.fname.toLowerCase().includes(search) ||
+    l.lname.toLowerCase().includes(search) ||
+    l.purpose.toLowerCase().includes(search)
+    );
+    renderLogs(filtered);
+});
+
+document.getElementById('sortSelect').addEventListener('change', e => {
+    const sortBy = e.target.value;
+    let sorted = [...logs];
+    if (sortBy === 'fname') sorted.sort((a, b) => a.fname.localeCompare(b.fname));
+    else if (sortBy === 'date') sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
+    else sorted.sort((a, b) => b.id - a.id);
+    renderLogs(sorted);
+});
+
+document.getElementById('filterDateBtn').addEventListener('click', () => {
+    const fromDate = new Date(document.getElementById('fromDate').value);
+    const toDate = new Date(document.getElementById('toDate').value);
+
+    if (isNaN(fromDate) || isNaN(toDate)) {
+    alert('Please select both From and To dates');
+    return;
+    }
+
+    const filtered = logs.filter(log => {
+    const logDate = new Date(log.date);
+    return logDate >= fromDate && logDate <= toDate;
+    });
+
+    renderLogs(filtered);
+});
+
+renderLogs(logs);
+
+const ctx = document.getElementById('serviceChart');
+const serviceChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+    labels: ['Oct 9', 'Oct 10', 'Oct 11', 'Oct 12', 'Oct 13', 'Oct 14', 'Oct 15'],
+    datasets: [{
+        label: 'Service Logs per Day',
+        data: [2, 3, 2, 2, 3, 3, 2],
+        borderWidth: 1,
+        backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796', '#20c997']
+    }]
+    },
+    options: {
+    scales: { y: { beginAtZero: true } }
+    }
+});
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  const response = await fetch("/api/logout", {
+    method: "POST",
+    credentials: "include"
+  });
+
+  if (response.ok) {
+    // Clear any local data and redirect to login page
+    window.location.href = "index.html";
+  } else {
+    alert("Logout failed!");
+  }
+}); 
+
+
+ // Tab switching
+const tabBtns = document.querySelectorAll('.tab-btn');
+const tabContents = document.querySelectorAll('.tab-content');
+
+tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const tab = btn.getAttribute('data-tab');
+        tabContents.forEach(tc => {
+            tc.classList.remove('active');
+            if(tc.id === tab) tc.classList.add('active');
+        });
+    });
+});
+
+
+// ADMIN LIST TAB
+
+// Admin list array
+let admins = [];
+
+// Fetch admins from backend
+async function loadAdmins() {
+    try {
+        const response = await fetch("/api/superuser/admin-list"); // Make sure this endpoint returns admin list
+        admins = await response.json(); // store in global array
+        renderAdminTable();
+    } catch (error) {
+        console.error("Failed to load admins:", error);
+    }
+}
+
+// Render admins table
+function renderAdminTable() {
+    const tbody = document.getElementById("adminBody");
+    tbody.innerHTML = ""; // Clear table
+
+    admins.forEach(admin => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${admin.id}</td>
+            <td>${admin.firstName}</td>
+            <td>${admin.middleInitial}</td>
+            <td>${admin.lastName}</td>
+            <td>${admin.email}</td>
+            <td>${admin.role}</td>
+            <td><button class="delete-btn" onclick="deleteAdmin(${admin.id})">Delete</button></td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}
+
+// Delete admin by ID (frontend only for now)
+function deleteAdmin(adminId) {
+    if (confirm("Are you sure you want to delete this admin?")) {
+        // Remove from array
+        admins = admins.filter(admin => admin.id !== adminId);
+        renderAdminTable();
+
+        // TODO: Call backend to delete admin in DB
+        // fetch(`/api/admin/${adminId}`, { method: 'DELETE' });
+    }
+}
+
+// Initial load
+loadAdmins();

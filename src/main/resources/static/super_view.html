@@ -1,1 +1,102 @@
-SUPER ADMIN
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DICT-CN Office Logs System</title>
+
+        <script src="js/chart/chart.umd.js"></script>
+
+        <link rel="stylesheet" href="css/super_view.css"> 
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-icons.css" rel="stylesheet">
+        <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <header class="d-flex justify-content-between align-items-center p-3 bg-light border-bottom">
+            <h1 class="h4 m-0">DICT-CN OFFICE LOGS SYSTEM</h1>
+            <div class="d-flex align-items-center gap-3">
+                <span>Welcome Aundray</span>
+                <button id="logoutBtn" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </div>
+        </header> 
+
+        <div class="container">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="visitorsTab">Visitors & Analytics</button>
+                <button class="tab-btn" data-tab="adminsTab">Admin Management</button>
+            </div>
+
+            <!-- Visitors & Analytics Tab -->
+            <div id="visitorsTab" class="tab-content active">
+                <h2>Service Logs</h2>
+                <div class="controls">
+                    <input type="text" id="searchInput" placeholder="Search logs...">
+                    <select id="sortSelect">
+                        <option value="id">Sort by ID</option>
+                        <option value="fname">Sort by First Name</option>
+                        <option value="date">Sort by Date</option>
+                    </select>
+                    <label>From:</label><input type="date" id="fromDate">
+                    <label>To:</label><input type="date" id="toDate">
+                    <button id="filterDateBtn">Filter by Date</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="logsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Image</th>
+                                <th>First Name</th>
+                                <th>M.I.</th>
+                                <th>Last Name</th>
+                                <th>Purpose</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="analytics">
+                    <h2>Analytics Overview</h2>
+                    <div class="chart-container">
+                        <canvas id="serviceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Management Tab -->
+            <div id="adminsTab" class="tab-content">
+                <h2>Admin List</h2>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>First Name</th>
+                                <th>M.I.</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminBody">
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <script src="js/super_view.js"></script> 
+        <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

@@ -1,0 +1,48 @@
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f3f6fa;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background: linear-gradient(to right, #2b5876, #4e4376);
+    color: white;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+header h1 { margin: 0; font-size: 1.5rem; letter-spacing: 1px; }
+.container { padding: 25px; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 15px; }
+.controls input, .controls select { padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+th, td { text-align: left; padding: 12px 15px; }
+th { background-color: #4e73df; color: white; cursor: pointer; }
+tr:nth-child(even) { background-color: #f8f9fc; }
+img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; }
+.action-btn { background: #e74a3b; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+.action-btn:hover { background: #c0392b; }
+.table-container { max-height: 400px; overflow-y: auto; border-radius: 10px; background: white; }
+.analytics { margin-top: 40px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.chart-container { width: 100%; max-width: 600px; margin: auto; }
+
+.table-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+
+
+/* Tab Styles */
+.tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+.tab-btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; background: #e0e0e0; }
+.tab-btn.active { background: #4e73df; color: white; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.admin-table img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; }
+.delete-btn { background: #e74a3b; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+.delete-btn:hover { background: #c0392b; }

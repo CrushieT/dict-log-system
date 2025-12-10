@@ -33,10 +33,9 @@ public class AdminController {
         return adminRepository.save(admin);
     }
 
-    // 🟡 READ all Admins
-    @GetMapping
+    @GetMapping("/admin-list")
     public List<Admin> getAllAdmins() {
-        return adminRepository.findAll();
+        return adminRepository.findByRole("ADMIN");
     }
 
     @GetMapping("/visitor")
