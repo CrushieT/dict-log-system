@@ -77,7 +77,7 @@ public class SecurityConfig {
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/assets/**", "/opencv/**", "/models/**").permitAll()
                 .requestMatchers("/index.html", "/admin_reg.html", "/visitor_reg.html", "/super_reg.html","/haarcascade_frontalface_default.xml").permitAll()
                 .requestMatchers("/api/admin/**", "/admin_view.html").hasRole("ADMIN")
-                .requestMatchers("/api/admin/**", "/api/superuser/**", "/super_view.html").hasRole("SUPERUSER")
+                .requestMatchers("/api/superuser/**", "/super_view.html").hasRole("SUPERUSER")
 
                 .anyRequest().authenticated()
                 )

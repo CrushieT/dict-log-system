@@ -29,16 +29,22 @@
     <div class="container">
         <h2>Service Logs</h2>
         <div class="controls">
-        <input type="text" id="searchInput" placeholder="Search logs...">
-        <select id="sortSelect">
-            <option value="id">Sort by ID</option>
-            <option value="fname">Sort by First Name</option>
-            <option value="date">Sort by Date</option>
-        </select>
-        <label>From:</label><input type="date" id="fromDate">
-        <label>To:</label><input type="date" id="toDate">
-        <button id="filterDateBtn">Filter by Date</button>
+            <input type="text" id="searchInput" placeholder="Search logs...">
+            <select id="sortSelect">
+                <option value="id">Sort by ID</option>
+                <option value="fname">Sort by First Name</option>
+                <option value="date">Sort by Date</option>
+            </select>
+            <label>From:</label><input type="date" id="fromDate">
+            <label>To:</label><input type="date" id="toDate">
+            <button id="filterDateBtn">Filter by Date</button>
+
+            <!-- ✅ EXPORT BUTTON -->
+            <button id="exportExcelBtn" class="btn btn-success btn-sm">
+                Export to Excel
+            </button>
         </div>
+
 
         <div class="table-container">
         <table id="logsTable">
@@ -68,6 +74,11 @@
 
   
     <script src="js/admin_view.js"></script> 
-    <script src="js/bootstrap/bootstrap.bundle.min.js"></script>   
+    <script src="js/bootstrap/bootstrap.bundle.min.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+
+  
 </body>
 </html>

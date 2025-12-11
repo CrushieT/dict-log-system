@@ -153,3 +153,68 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
     alert("Logout failed!");
   }
 }); 
+
+// Excel export
+document.getElementById("exportExcelBtn").addEventListener("click", async () => {
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Visitor Logs");
+
+    // Set headers
+    sheet.addRow(["ID", "Image", "First Name", "M.I.", "Last Name", "Purpose", "Date"]);
+
+    const rows = document.querySelectorAll("#logsBody tr");
+
+    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+        const cells = rows[rowIndex].children;
+
+        const row = sheet.addRow([
+            cells[0].textContent,
+            "", // placeholder for image
+            cells[2].textContent,
+            cells[3].textContent,
+            cells[4].textContent,
+            cells[5].textContent,
+            cells[6].textContent
+        ]);
+
+        // Process image
+        const img = cells[1].querySelector("img");
+        if (img) {
+            const imageUrl = img.src;
+
+            // Fetch image as arrayBuffer
+            const arrayBuffer = await fetch(imageUrl).then(res => res.arrayBuffer());
+
+            // Add image to workbook
+            const imageId = workbook.addImage({
+                buffer: arrayBuffer,
+                extension: imageUrl.endsWith(".png") ? "png" : "jpeg",
+            });
+
+            // Place image into the cell (rowIndex + 2 to skip headers)
+            sheet.addImage(imageId, {
+                tl: { col: 1, row: rowIndex + 1 },
+                br: { col: 2, row: rowIndex + 2 }
+            });
+
+            sheet.getRow(rowIndex + 2).height = 60;
+        }
+    }
+
+    // Column widths
+    sheet.columns = [
+        { width: 8 },
+        { width: 15 },
+        { width: 18 },
+        { width: 8 },
+        { width: 18 },
+        { width: 25 },
+        { width: 15 }
+    ];
+
+    // Export file
+    workbook.xlsx.writeBuffer().then(buffer => {
+        const blob = new Blob([buffer], { type: "application/octet-stream" });
+        saveAs(blob, "visitor_logs_with_images.xlsx");
+    });
+});
