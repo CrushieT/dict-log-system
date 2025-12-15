@@ -34,4 +34,4 @@ build/
 
 *.p12
 .env
-log_system.db
+dict_log_system.db
