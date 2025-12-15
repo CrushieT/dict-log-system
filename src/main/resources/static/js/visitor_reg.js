@@ -254,3 +254,23 @@ visitorForm.addEventListener('submit', async (e) => {
         alert("Error sending request: " + err.message);
     }
 });
+
+
+
+
+async function fetchSuggestions() {
+    let input = document.getElementById("purposeInput").value;
+    if (input.length < 2) return;
+
+    let res = await fetch("/api/predict?input=" + encodeURIComponent(input));
+    let suggestions = await res.json();
+
+    let ul = document.getElementById("suggestions");
+    ul.innerHTML = "";
+    suggestions.forEach(item => {
+        let li = document.createElement("li");
+        li.textContent = item;
+        li.onclick = () => document.getElementById("purposeInput").value = item;
+        ul.appendChild(li);
+    });
+}

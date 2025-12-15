@@ -6,6 +6,7 @@ import com.dict.log_system.repository.AdminRepository;
 import com.dict.log_system.repository.VisitorRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.nio.file.Path;
 
 
@@ -26,6 +28,14 @@ public class AdminController {
 
     @Autowired
     private AdminRepository adminRepository;
+
+    @Value("${METABASE_URL}")
+    private String metabaseUrl;
+
+    @GetMapping("/metabase-url")
+    public Map<String, String> getMetabaseUrl() {
+        return Map.of("url", metabaseUrl);
+    }
 
     // 🟢 CREATE Admin
     @PostMapping

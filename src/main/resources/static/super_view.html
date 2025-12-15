@@ -16,7 +16,7 @@
         <header class="d-flex justify-content-between align-items-center p-3 bg-light border-bottom">
             <h1 class="h4 m-0">DICT-CN OFFICE LOGS SYSTEM</h1>
             <div class="d-flex align-items-center gap-3">
-                <span>Welcome Aundray</span>
+                <span>Welcome Superuser</span>
                 <button id="logoutBtn" class="btn btn-outline-danger btn-sm">
                     <i class="bi bi-box-arrow-right"></i> Logout
                 </button>
@@ -36,13 +36,20 @@
                 <div class="controls">
                     <input type="text" id="searchInput" placeholder="Search logs...">
                     <select id="sortSelect">
-                        <option value="id">Sort by ID</option>
-                        <option value="fname">Sort by First Name</option>
-                        <option value="date">Sort by Date</option>
+                        <option value="time_desc">Time ↓</option>
+                        <option value="time_asc">Time ↑</option>
+                        <option value="fname_asc">First Name ↑</option>
+                        <option value="fname_desc">First Name ↓</option>
+                        <option value="lname_asc">Last Name ↑</option>
+                        <option value="lname_desc">Last Name ↓</option>
                     </select>
                     <label>From:</label><input type="date" id="fromDate">
                     <label>To:</label><input type="date" id="toDate">
                     <button id="filterDateBtn">Filter by Date</button>
+                    <!-- ✅ EXPORT BUTTON -->
+                    <button id="exportExcelBtn" class="btn btn-success btn-sm">
+                        Export to Excel
+                    </button>
                 </div>
 
                 <div class="table-container">
@@ -65,8 +72,11 @@
 
                 <div class="analytics">
                     <h2>Analytics Overview</h2>
-                    <div class="chart-container">
+                    <!-- <div class="chart-container">
                         <canvas id="serviceChart"></canvas>
+                    </div> -->
+                    <div id="dashboardContainer">
+                        <iframe id="metabaseFrame" src="" frameborder="0" allowtransparency="true"></iframe>
                     </div>
                 </div>
             </div>
@@ -98,5 +108,8 @@
 
         <script src="js/super_view.js"></script> 
         <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+        
+        <script src="js/excel-export/exceljs.min.js"></script>
+        <script src="js/excel-export/FileSaver.min.js"></script>
     </body>
 </html>
