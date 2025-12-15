@@ -1,4 +1,13 @@
 
+//hide create an account if 2 admin
+fetch('/api/check-admin-count')
+  .then(response => response.json())
+  .then(canRegister => {
+    if (!canRegister) {
+      document.getElementById('registerLink').style.display = 'none';
+    }
+  });
+
 document.addEventListener("DOMContentLoaded", function () {
     const registerModal = new bootstrap.Modal(document.getElementById("registerModal"));
     const otpModal = new bootstrap.Modal(document.getElementById("otpModal"));
