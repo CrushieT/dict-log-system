@@ -1,6 +1,7 @@
 package com.dict.log_system.controller;
 
 import com.dict.log_system.model.Admin;
+import com.dict.log_system.repository.AdminRepository;
 import com.dict.log_system.service.AdminService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,7 @@ import java.util.Map;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +28,8 @@ public class AuthController {
 
     private final AdminService service;
     private final AuthenticationManager authenticationManager;
+    @Autowired
+    private AdminRepository adminRepository;
 
     public AuthController(AdminService service, AuthenticationManager authenticationManager) {
         this.service = service;
@@ -76,6 +80,13 @@ public class AuthController {
         }
     }
 
+    
+    @GetMapping("/check-admin-count")
+    public boolean checkAdminCount() {
+        long adminCount = adminRepository.countByRole("ADMIN");
+        // Return true if less than 2 admins exist, otherwise false
+        return adminCount < 2;
+    }
 
 
     

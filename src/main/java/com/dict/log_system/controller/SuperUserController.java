@@ -19,28 +19,24 @@ import java.nio.file.Path;
 
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/superuser")
 @CrossOrigin(origins = "*") // allows frontend or mobile apps to access the API
-public class AdminController {
+public class SuperUserController {
 
+    
     @Autowired
     private VisitorRepository visitorRepository;
 
     @Autowired
     private AdminRepository adminRepository;
 
+    
     @Value("${METABASE_URL}")
     private String metabaseUrl;
 
     @GetMapping("/metabase-url")
     public Map<String, String> getMetabaseUrl() {
         return Map.of("url", metabaseUrl);
-    }
-
-    // 🟢 CREATE Admin
-    @PostMapping
-    public Admin createAdmin(@RequestBody Admin admin) {
-        return adminRepository.save(admin);
     }
 
     @GetMapping("/admin-list")
@@ -51,30 +47,6 @@ public class AdminController {
     @GetMapping("/visitor")
     public List<Visitor> getAllVisitors() {
         return visitorRepository.findAll();
-    }
-
-    // 🟠 READ one Admin by ID
-    @GetMapping("/{id}")
-    public Admin getAdminById(@PathVariable Long id) {
-        return adminRepository.findById(id).orElse(null);
-    }
-
-    // 🔵 UPDATE Admin
-    @PutMapping("/{id}")
-    public Admin updateAdmin(@PathVariable Long id, @RequestBody Admin adminDetails) {
-        Admin admin = adminRepository.findById(id).orElse(null);
-        if (admin != null) {
-            admin.setFirstName(adminDetails.getFirstName());
-            admin.setMiddleInitial(adminDetails.getMiddleInitial());
-            admin.setLastName(adminDetails.getLastName());
-            admin.setBirthday(adminDetails.getBirthday());
-            admin.setSex(adminDetails.getSex());
-            admin.setEmail(adminDetails.getEmail());
-            admin.setCp(adminDetails.getCp());
-            admin.setPassword(adminDetails.getPassword());
-            return adminRepository.save(admin);
-        }
-        return null;
     }
 
     @DeleteMapping("/visitor/{id}")
@@ -97,5 +69,4 @@ public class AdminController {
             return ResponseEntity.ok("Visitor deleted successfully");
         }).orElse(ResponseEntity.status(404).body("Visitor not found"));
     }
-
 }

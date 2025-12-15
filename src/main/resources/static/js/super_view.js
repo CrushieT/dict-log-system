@@ -1,12 +1,10 @@
-
-
 let logs = [];         // global array to keep current visitors
 let filteredLogs = []; // filtered logs for search/sort
 
 // Fetch visitors
 async function loadVisitors() {
     try {
-        const response = await fetch("/api/admin/visitor");
+        const response = await fetch("/api/superuser/visitor");
         logs = await response.json(); 
         filteredLogs = [...logs]; // initialize filteredLogs
         applySort(); // apply initial sort if needed
@@ -19,7 +17,7 @@ async function loadVisitors() {
 // Fetch Metabase dashboard URL
 async function loadDashboard() {
     try {
-        const response = await fetch('/api/admin/metabase-url'); // endpoint returns {url: "..."}
+        const response = await fetch('/api/superuser/metabase-url'); // endpoint returns {url: "..."}
         const data = await response.json();
         document.getElementById('metabaseFrame').src = data.url;
     } catch (err) {
@@ -116,7 +114,7 @@ document.addEventListener("click", async function (e) {
         if (!confirmDelete) return;
 
         try {
-            const response = await fetch(`/api/admin/visitor/${id}`, { method: 'DELETE' });
+            const response = await fetch(`/api/superuser/visitor/${id}`, { method: 'DELETE' });
 
             if (response.ok) {
                 const index = logs.findIndex(l => l.id == id);
@@ -176,7 +174,6 @@ window.onload = () => {
     loadVisitors();
 };
 
-
 renderLogs(logs);
 
 
@@ -194,6 +191,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
     alert("Logout failed!");
   }
 }); 
+
 
 // Excel export
 document.getElementById("exportExcelBtn").addEventListener("click", async () => {
@@ -262,8 +260,75 @@ document.getElementById("exportExcelBtn").addEventListener("click", async () => 
 
 
 
-// metabase
 
-// you will need to install via 'npm install jsonwebtoken' or in your package.json
+ // Tab switching
+const tabBtns = document.querySelectorAll('.tab-btn');
+const tabContents = document.querySelectorAll('.tab-content');
 
-// Paste your pre-generated signed embed URL here
+tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const tab = btn.getAttribute('data-tab');
+        tabContents.forEach(tc => {
+            tc.classList.remove('active');
+            if(tc.id === tab) tc.classList.add('active');
+        });
+    });
+});
+
+
+// ADMIN LIST TAB
+
+// Admin list array
+let admins = [];
+
+// Fetch admins from backend
+async function loadAdmins() {
+    try {
+        const response = await fetch("/api/superuser/admin-list"); // Make sure this endpoint returns admin list
+        admins = await response.json(); // store in global array
+        renderAdminTable();
+    } catch (error) {
+        console.error("Failed to load admins:", error);
+    }
+}
+
+
+// Render admins table
+function renderAdminTable() {
+    const tbody = document.getElementById("adminBody");
+    tbody.innerHTML = ""; // Clear table
+
+    admins.forEach(admin => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${admin.id}</td>
+            <td>${admin.firstName}</td>
+            <td>${admin.middleInitial}</td>
+            <td>${admin.lastName}</td>
+            <td>${admin.email}</td>
+            <td>${admin.role}</td>
+            <td><button class="delete-btn" onclick="deleteAdmin(${admin.id})">Delete</button></td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}
+
+// Delete admin by ID (frontend only for now)
+function deleteAdmin(adminId) {
+    if (confirm("Are you sure you want to delete this admin?")) {
+        // Remove from array
+        admins = admins.filter(admin => admin.id !== adminId);
+        renderAdminTable();
+
+        // TODO: Call backend to delete admin in DB
+        // fetch(`/api/admin/${adminId}`, { method: 'DELETE' });
+    }
+}
+
+// Initial load 
+loadAdmins();

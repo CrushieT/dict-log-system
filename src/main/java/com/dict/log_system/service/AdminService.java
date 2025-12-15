@@ -55,12 +55,25 @@ public class AdminService {
 
     
     public boolean registerUser(Admin admin) {
+
+        // Prevent duplicate emails
         if (repo.existsByEmail(admin.getEmail())) {
             System.out.println("❌ Email already exists in DB: " + admin.getEmail());
             return false;
         }
-        
+
+        // 🚫 Prevent more than 2 admins
+        if ("admin".equalsIgnoreCase(admin.getRole())) {
+            long adminCount = repo.countByRole("admin");
+            if (adminCount >= 2) {
+                System.out.println("❌ Admin limit reached. Only 2 admins allowed.");
+                throw new IllegalStateException("Only 2 admin accounts are allowed.");
+            }
+        }
+
         System.out.println("Name Check: " + admin.getFirstName()+admin.getMiddleInitial()+admin.getLastName());
+
+        // Check for pending OTP
         PendingRegistration existing = pending.get(admin.getEmail());
         if (existing != null && !existing.isExpired()) {
             System.out.println("⚠️ Pending OTP still active for: " + admin.getEmail());
@@ -75,6 +88,7 @@ public class AdminService {
         System.out.println("📧 OTP sent to " + admin.getEmail() + ": " + otp);
         return true;
     }
+
 
     
     public boolean verifyOtp(String email, String otp) {
