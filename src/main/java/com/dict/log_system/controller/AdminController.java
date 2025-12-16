@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,6 +29,8 @@ public class AdminController {
 
     @Autowired
     private AdminRepository adminRepository;
+    
+    private static final String EXPORT_DIR = "C:/dict_log/excel";
 
     @Value("${METABASE_URL}")
     private String metabaseUrl;
@@ -96,6 +99,44 @@ public class AdminController {
             visitorRepository.deleteById(id);
             return ResponseEntity.ok("Visitor deleted successfully");
         }).orElse(ResponseEntity.status(404).body("Visitor not found"));
+    }
+
+    @GetMapping("/visitors-count")
+    public long getVisitorCount() {
+        return visitorRepository.count();
+    }
+
+    @GetMapping("visitors-first-1000")
+    public List<Visitor> getFirst1000Visitors() {
+        return visitorRepository.findTop1000ByOrderByTimestampAsc();
+    }
+
+    @PostMapping("/exportExcel")
+    public ResponseEntity<String> uploadExcel(@RequestParam("file") MultipartFile file) {
+        try {
+            // Ensure export folder exists
+            Path dirPath = Paths.get(EXPORT_DIR);
+            Files.createDirectories(dirPath);
+
+            // Save the uploaded Excel file
+            Path filePath = dirPath.resolve(file.getOriginalFilename());
+            file.transferTo(filePath.toFile());
+            System.out.println("Excel file saved at: " + filePath.toAbsolutePath());
+
+            // Fetch first 1000 visitors
+            List<Visitor> first1000 = visitorRepository.findTop1000ByOrderByTimestampAsc();
+
+            // Delete them safely
+            if (!first1000.isEmpty()) {
+                visitorRepository.deleteAll(first1000);
+                System.out.println("Deleted first 1000 visitors after Excel export.");
+            }
+
+            return ResponseEntity.ok("Excel uploaded and first 1000 visitors deleted successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Failed to save Excel file.");
+        }
     }
 
 }
