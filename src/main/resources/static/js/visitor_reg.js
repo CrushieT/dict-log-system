@@ -171,7 +171,7 @@ document.getElementById("agreeBtn").addEventListener("click", () => {
         document.getElementById("privacyModal")
     ).hide();
 
-    statusText.innerHTML = "✅ Photo captured with consent.";
+    statusText.innerHTML = "✅ Photo Captured";
     // pendingCapture is now FINAL
 });
 

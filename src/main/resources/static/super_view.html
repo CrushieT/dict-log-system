@@ -11,6 +11,30 @@
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/bootstrap-icons.css" rel="stylesheet">
         <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet">
+
+        <!-- BACKGROUND ONLY (ADDED) -->
+        <style>
+            body {
+                position: relative;
+                min-height: 100vh;
+                margin: 0;
+            }
+
+            body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                background-image: url("/fonts/DICT Logo with Black Outline copy.png");
+                background-repeat: no-repeat;
+                background-position: center;
+                background-size: 150%; /* zoomed */
+                opacity: 0.35;         /* 35% opacity */
+                z-index: -1;
+                pointer-events: none;
+            }
+        </style>
+        <!-- END BACKGROUND -->
+
     </head>
     <body>
         <header class="d-flex justify-content-between align-items-center p-3 bg-light border-bottom">
@@ -72,9 +96,6 @@
 
                 <div class="analytics">
                     <h2>Analytics Overview</h2>
-                    <!-- <div class="chart-container">
-                        <canvas id="serviceChart"></canvas>
-                    </div> -->
                     <div id="dashboardContainer">
                         <iframe id="metabaseFrame" src="" frameborder="0" allowtransparency="true"></iframe>
                     </div>
@@ -97,9 +118,7 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="adminBody">
-                            
-                        </tbody>
+                        <tbody id="adminBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -108,7 +127,6 @@
 
         <script src="js/super_view.js"></script> 
         <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
-        
         <script src="js/excel-export/exceljs.min.js"></script>
         <script src="js/excel-export/FileSaver.min.js"></script>
     </body>

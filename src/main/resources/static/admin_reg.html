@@ -9,7 +9,29 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/bootstrap-icons.css" rel="stylesheet">
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" >
-  
+
+    <!-- BACKGROUND ONLY (ADDED) -->
+    <style>
+        body {
+            position: relative;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image: url("/fonts/DICT Logo with Black Outline copy.png");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 150%; /* zoomed */
+            opacity: 0.35;          /* 60% opacity */
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+    <!-- END BACKGROUND -->
+
 </head>
 
 <body class="bg-light d-flex align-items-center justify-content-center vh-100">

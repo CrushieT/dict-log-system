@@ -9,6 +9,30 @@
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/bootstrap-icons.css" rel="stylesheet">
         <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" >
+
+        <!-- BACKGROUND ONLY (ADDED) -->
+        <style>
+            body {
+                position: relative;
+                min-height: 100vh;
+                margin: 0;
+            }
+
+            body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                background-image: url("/fonts/DICT Logo with Black Outline copy.png");
+                background-repeat: no-repeat;
+                background-position: center;
+                background-size: 150%; /* zoomed */
+                opacity: 0.35;          /* 60% opacity */
+                z-index: -1;
+                pointer-events: none;
+            }
+        </style>
+        <!-- END BACKGROUND -->
+
     </head>
 
     <body>
@@ -23,7 +47,6 @@
             <canvas id="hiddenCanvas" class="d-none"></canvas>
             <img id="capturedImage" class="camera-feed d-none">
 
-
             <!-- Buttons -->
             <div class="d-grid gap-2">
                 <button id="captureBtn" class="btn btn-outline-secondary">
@@ -34,7 +57,6 @@
                 </button>
             </div>
         
-
             <form id="visitorForm" novalidate>
                 <div class="row g-2 mb-3">
                     <div class="col-md-5">
@@ -96,8 +118,6 @@
         <script src="js/visitor_reg.js"></script> 
         <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
         <script async src="opencv/opencv.js" onload="onOpenCvReady()"></script>
-        
     
     </body>
-
 </html>
