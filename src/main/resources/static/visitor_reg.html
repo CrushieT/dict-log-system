@@ -42,7 +42,7 @@
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="col-md-2">
-                        <input type="text" class="form-control" placeholder="MI" name="mi" required pattern="^[A-Za-z]$" maxlength="1">
+                        <input type="text" class="form-control" placeholder="MI" name="mi" pattern="^[A-Za-z]$" maxlength="1">
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="col-md-5">
@@ -71,6 +71,26 @@
 
                 <button type="submit" class="btn btn-primary w-100">Submit</button>
             </form>
+        </div>
+
+        <div class="modal fade" id="privacyModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Data Privacy Consent</h5>
+                </div>
+                <div class="modal-body">
+                    <p>
+                    By agreeing, you consent to the collection and processing of your photo
+                    for official record-keeping in accordance with the Data Privacy Act of 2012.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button id="disagreeBtn" class="btn btn-outline-secondary">Disagree</button>
+                    <button id="agreeBtn" class="btn btn-primary">I Agree</button>
+                </div>
+                </div>
+            </div>
         </div>
         
         <script src="js/visitor_reg.js"></script> 

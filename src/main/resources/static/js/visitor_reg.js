@@ -1,38 +1,43 @@
+// ===========================
+// OPENCV INIT
+// ===========================
 
 let cvReady = false;
 let faceCascade;
 
-// Called only after <script src="opencv.js" onload="onOpenCvReady()">
 function onOpenCvReady() {
-    cv['onRuntimeInitialized'] = async () => {
+    cv["onRuntimeInitialized"] = async () => {
         cvReady = true;
         console.log("OpenCV is ready.");
 
-        await initFaceDetection();    // Wait for cascade to load
+        await initFaceDetection();
         console.log("Cascade loaded.");
 
-        startCamera();                // Start camera AFTER cascade
+        startCamera();
     };
 }
 
 function initFaceDetection() {
-    // Load cascade from new folder
     const cascadeFile = "models/haarcascade_frontalface_default.xml";
 
     return fetch(cascadeFile)
         .then(res => res.arrayBuffer())
         .then(buf => {
-            // Create virtual file in OpenCV's filesystem
-            cv.FS_createDataFile("/", "haarcascade_frontalface_default.xml", new Uint8Array(buf), true, false);
+            cv.FS_createDataFile(
+                "/",
+                "haarcascade_frontalface_default.xml",
+                new Uint8Array(buf),
+                true,
+                false
+            );
             faceCascade = new cv.CascadeClassifier();
-            faceCascade.load("haarcascade_frontalface_default.xml"); // always load from root "/"
-            console.log("Cascade loaded.");
+            faceCascade.load("haarcascade_frontalface_default.xml");
         });
 }
 
-// ---------------------------
+// ===========================
 // CAMERA + FACE DETECTION
-// ---------------------------
+// ===========================
 
 const video = document.getElementById("cameraVideo");
 const capturedImage = document.getElementById("capturedImage");
@@ -44,16 +49,12 @@ const recaptureBtn = document.getElementById("recaptureBtn");
 
 let stream = null;
 let detectInterval = null;
+let pendingCapture = null; // TEMP image until consent
 
 async function startCamera() {
-    if (!cvReady || !faceCascade) {
-        console.log("Waiting for OpenCV...");
-        return;
-    }
+    if (!cvReady || !faceCascade) return;
 
-    if (stream) {
-        stream.getTracks().forEach(t => t.stop());
-    }
+    if (stream) stream.getTracks().forEach(t => t.stop());
 
     stream = await navigator.mediaDevices.getUserMedia({ video: true });
     video.srcObject = stream;
@@ -69,7 +70,6 @@ function startDetectionLoop() {
 
     hiddenCanvas.width = video.videoWidth;
     hiddenCanvas.height = video.videoHeight;
-
     const ctx = hiddenCanvas.getContext("2d");
 
     detectInterval = setInterval(() => {
@@ -77,36 +77,30 @@ function startDetectionLoop() {
 
         const frame = cv.imread(hiddenCanvas);
         const gray = new cv.Mat();
-        cv.cvtColor(frame, gray, cv.COLOR_RGBA2GRAY, 0);
+        cv.cvtColor(frame, gray, cv.COLOR_RGBA2GRAY);
 
         const faces = new cv.RectVector();
         faceCascade.detectMultiScale(gray, faces, 1.1, 3, 0);
 
-        // Calculate mean brightness for "too dark" detection
-        const meanBrightness = cv.mean(gray)[0];
+        const brightness = cv.mean(gray)[0];
 
-        // ---------------------------
-        // STATUS LOGIC
-        // ---------------------------
         if (faces.size() === 0) {
             statusText.innerHTML = "No face detected ✗";
-        } else if (faces.size() > 3) { // Too many people threshold
+        } else if (faces.size() > 3) {
             statusText.innerHTML = "Too many people!";
-        } else if (meanBrightness < 50) { // Too dark threshold
+        } else if (brightness < 50) {
             statusText.innerHTML = "Too dark!";
         } else {
             statusText.innerHTML = "Face detected ✓";
         }
 
-        frame.delete();
-        gray.delete();
-        faces.delete();
+        cleanup(frame, gray, faces);
     }, 150);
 }
 
-// ---------------------------
-// CAPTURE BUTTON
-// ---------------------------
+// ===========================
+// CAPTURE (WITH CONSENT FLOW)
+// ===========================
 
 captureBtn.addEventListener("click", () => {
     const ctx = hiddenCanvas.getContext("2d");
@@ -114,47 +108,40 @@ captureBtn.addEventListener("click", () => {
 
     const frame = cv.imread(hiddenCanvas);
     const gray = new cv.Mat();
-    cv.cvtColor(frame, gray, cv.COLOR_RGBA2GRAY, 0);
+    cv.cvtColor(frame, gray, cv.COLOR_RGBA2GRAY);
 
     const faces = new cv.RectVector();
     faceCascade.detectMultiScale(gray, faces, 1.1, 3, 0);
 
-    const meanBrightness = cv.mean(gray)[0];
+    const brightness = cv.mean(gray)[0];
 
     if (faces.size() === 0) {
-        statusText.innerHTML = "❌ Cannot capture — No face detected.";
-        frame.delete();
-        gray.delete();
-        faces.delete();
+        statusText.innerHTML = "❌ No face detected.";
+        cleanup(frame, gray, faces);
         return;
     }
 
     if (faces.size() > 2) {
-        statusText.innerHTML = "❌ Cannot capture — Too many people.";
-        frame.delete();
-        gray.delete();
-        faces.delete();
+        statusText.innerHTML = "❌ Too many people.";
+        cleanup(frame, gray, faces);
         return;
     }
 
-    if (meanBrightness < 30) {
-        statusText.innerHTML = "❌ Cannot capture — Too dark.";
-        frame.delete();
-        gray.delete();
-        faces.delete();
+    if (brightness < 30) {
+        statusText.innerHTML = "❌ Too dark.";
+        cleanup(frame, gray, faces);
         return;
     }
 
-    // Capture allowed
-    capturedImage.src = hiddenCanvas.toDataURL("image/png");
-
-    capturedImage.style.width = `${video.clientWidth}px`;
-    capturedImage.style.height = `${video.clientHeight}px`;
-    capturedImage.style.objectFit = "cover";
+    // TEMP CAPTURE
+    pendingCapture = hiddenCanvas.toDataURL("image/png");
+    capturedImage.src = pendingCapture;
+    capturedImage.classList.remove("d-none");
+    capturedImage.style.width = video.clientWidth + "px"; // full video width
+    capturedImage.style.height = video.clientHeight + "px";
     capturedImage.style.display = "block";
     capturedImage.style.margin = "0 auto";
-
-    capturedImage.classList.remove("d-none");
+    capturedImage.style.objectFit = "cover";
     video.classList.add("d-none");
 
     captureBtn.classList.add("d-none");
@@ -163,16 +150,49 @@ captureBtn.addEventListener("click", () => {
     if (stream) stream.getTracks().forEach(t => t.stop());
     if (detectInterval) clearInterval(detectInterval);
 
-    frame.delete();
-    gray.delete();
-    faces.delete();
+    cleanup(frame, gray, faces);
+
+    showPrivacyModal();
 });
 
-// ---------------------------
+// ===========================
+// PRIVACY CONSENT
+// ===========================
+
+function showPrivacyModal() {
+    new bootstrap.Modal(
+        document.getElementById("privacyModal"),
+        { backdrop: "static", keyboard: false }
+    ).show();
+}
+
+document.getElementById("agreeBtn").addEventListener("click", () => {
+    bootstrap.Modal.getInstance(
+        document.getElementById("privacyModal")
+    ).hide();
+
+    statusText.innerHTML = "✅ Photo captured with consent.";
+    // pendingCapture is now FINAL
+});
+
+document.getElementById("disagreeBtn").addEventListener("click", () => {
+    pendingCapture = null;
+
+    bootstrap.Modal.getInstance(
+        document.getElementById("privacyModal")
+    ).hide();
+
+    statusText.innerHTML = "❌ Capture cancelled — consent required.";
+
+    recaptureBtn.click();
+});
+
+// ===========================
 // RECAPTURE
-// ---------------------------
+// ===========================
 
 recaptureBtn.addEventListener("click", () => {
+    pendingCapture = null;
     capturedImage.classList.add("d-none");
     video.classList.remove("d-none");
 
@@ -181,6 +201,17 @@ recaptureBtn.addEventListener("click", () => {
 
     startCamera();
 });
+
+// ===========================
+// CLEANUP HELPER
+// ===========================
+
+function cleanup(frame, gray, faces) {
+    frame.delete();
+    gray.delete();
+    faces.delete();
+}
+
 
 
 /////////////////////////////////

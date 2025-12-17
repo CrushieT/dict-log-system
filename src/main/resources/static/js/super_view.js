@@ -1,3 +1,133 @@
+
+document.addEventListener("DOMContentLoaded", async () => {
+    // Load visitor logs first
+    await loadVisitors();
+
+    // Render table
+    renderLogs(filteredLogs);
+
+    // Check if visitor count reached 1000
+    checkExcelThreshold();
+});
+
+// Function to check visitor count
+async function checkExcelThreshold() {
+    if (logs.length >= 1000) {
+        alert("Visitor count reached 1000.\nGenerating Excel file now...");
+        generateExcelFromTable(false); // auto export
+    }
+}
+
+// Function to generate Excel from the HTML table
+async function generateExcelFromTable(isManualExport = false) {
+    const rows = document.querySelectorAll("#logsBody tr");
+    if (!rows.length) {
+        alert("No visitor data to export!");
+        return;
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Visitor Logs");
+
+    // Header row
+    sheet.addRow(["ID", "Image", "First Name", "M.I.", "Last Name", "Purpose", "Timestamp"]);
+
+    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+        const cells = rows[rowIndex].children;
+
+        // Add row and get actual row number
+        const newRow = sheet.addRow([
+            cells[0].textContent,
+            "", // image placeholder
+            cells[2].textContent,
+            cells[3].textContent,
+            cells[4].textContent,
+            cells[5].textContent,
+            cells[6].textContent
+        ]);
+
+        // Process image
+        const img = cells[1].querySelector("img");
+        if (img) {
+            try {
+                const buffer = await fetch(img.src).then(res => res.arrayBuffer());
+
+                const imageId = workbook.addImage({
+                    buffer,
+                    extension: img.src.endsWith(".png") ? "png" : "jpeg",
+                });
+
+                // Attach image to the correct row
+                sheet.addImage(imageId, {
+                    tl: { col: 1, row: newRow.number - 1 },
+                    br: { col: 2, row: newRow.number }
+                });
+
+                sheet.getRow(newRow.number).height = 60;
+            } catch (err) {
+                console.warn("Failed to load image for row", rowIndex + 1, err);
+            }
+        }
+    }
+
+    // Column widths
+    sheet.columns = [
+        { width: 8 },
+        { width: 15 },
+        { width: 18 },
+        { width: 8 },
+        { width: 18 },
+        { width: 25 },
+        { width: 20 }
+    ];
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: "application/octet-stream" });
+
+    // Upload to server
+    uploadExcelToServer(blob, isManualExport);
+}
+
+// Upload function
+async function uploadExcelToServer(blob, isManualExport = false) {
+    const formData = new FormData();
+
+    const manilaTime = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+    const formattedTimestamp = manilaTime.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+    }).replace(/, /g, "_").replace(/:/g, "-").replace(" ", "");
+
+    const filename = `visitor_logs_${formattedTimestamp}.xlsx`;
+    formData.append("file", blob, filename);
+
+    try {
+        const response = await fetch("/api/superuser/exportExcel", {
+            method: "POST",
+            body: formData
+        });
+
+        const text = await response.text();
+
+        if (isManualExport) {
+            alert("Excel successfully uploaded!");
+        } else {
+            alert(text); // e.g., "Deleted first 1000 visitors..."
+        }
+
+        // Re-render logs after deletion
+        await loadVisitors();
+        renderLogs(filteredLogs);
+
+    } catch (err) {
+        alert("Failed to upload Excel: " + err.message);
+    }
+}
+
 let logs = [];         // global array to keep current visitors
 let filteredLogs = []; // filtered logs for search/sort
 
@@ -206,7 +336,8 @@ document.getElementById("exportExcelBtn").addEventListener("click", async () => 
     for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
         const cells = rows[rowIndex].children;
 
-        const row = sheet.addRow([
+        // Add row and get actual row number
+        const newRow = sheet.addRow([
             cells[0].textContent,
             "", // placeholder for image
             cells[2].textContent,
@@ -219,44 +350,40 @@ document.getElementById("exportExcelBtn").addEventListener("click", async () => 
         // Process image
         const img = cells[1].querySelector("img");
         if (img) {
-            const imageUrl = img.src;
+            const arrayBuffer = await fetch(img.src).then(res => res.arrayBuffer());
 
-            // Fetch image as arrayBuffer
-            const arrayBuffer = await fetch(imageUrl).then(res => res.arrayBuffer());
-
-            // Add image to workbook
             const imageId = workbook.addImage({
                 buffer: arrayBuffer,
-                extension: imageUrl.endsWith(".png") ? "png" : "jpeg",
+                extension: img.src.endsWith(".png") ? "png" : "jpeg",
             });
 
-            // Place image into the cell (rowIndex + 2 to skip headers)
+            // Attach image to the correct row
             sheet.addImage(imageId, {
-                tl: { col: 1, row: rowIndex + 1 },
-                br: { col: 2, row: rowIndex + 2 }
+                tl: { col: 1, row: newRow.number - 1 }, // top-left
+                br: { col: 2, row: newRow.number }      // bottom-right
             });
 
-            sheet.getRow(rowIndex + 2).height = 60;
+            sheet.getRow(newRow.number).height = 60;
         }
     }
 
     // Column widths
     sheet.columns = [
-        { width: 8 },
-        { width: 15 },
-        { width: 18 },
-        { width: 8 },
-        { width: 18 },
-        { width: 25 },
-        { width: 15 }
+        { width: 8 }, { width: 15 }, { width: 18 },
+        { width: 8 }, { width: 18 }, { width: 25 }, { width: 15 }
     ];
 
-    // Export file
-    workbook.xlsx.writeBuffer().then(buffer => {
-        const blob = new Blob([buffer], { type: "application/octet-stream" });
-        saveAs(blob, "visitor_logs_with_images.xlsx");
-    });
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: "application/octet-stream" });
+
+    // Download locally (optional, commented out)
+    // saveAs(blob, "visitor_logs_with_images.xlsx");
+
+    // Upload to server with a flag to indicate "button export"
+    await uploadExcelToServer(blob, true); // pass `true` for manual export
 });
+
+
 
 
 

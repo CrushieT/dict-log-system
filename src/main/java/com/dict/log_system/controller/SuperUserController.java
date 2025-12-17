@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,6 +30,8 @@ public class SuperUserController {
 
     @Autowired
     private AdminRepository adminRepository;
+    
+    private static final String EXPORT_DIR = "C:/dict_log/excel";
 
     
     @Value("${METABASE_URL}")
@@ -69,4 +72,66 @@ public class SuperUserController {
             return ResponseEntity.ok("Visitor deleted successfully");
         }).orElse(ResponseEntity.status(404).body("Visitor not found"));
     }
+
+    @GetMapping("/visitors-count")
+    public long getVisitorCount() {
+        return visitorRepository.count();
+    }
+
+    @GetMapping("visitors-first-1000")
+    public List<Visitor> getFirst1000Visitors() {
+        return visitorRepository.findTop1000ByOrderByTimestampAsc();
+    }
+
+     @PostMapping("/exportExcel")
+    public ResponseEntity<String> uploadExcel(@RequestParam("file") MultipartFile file) {
+        try {
+            // Ensure export folder exists
+            Path dirPath = Paths.get(EXPORT_DIR);
+            Files.createDirectories(dirPath);
+
+            // Save the uploaded Excel file
+            Path filePath = dirPath.resolve(file.getOriginalFilename());
+            file.transferTo(filePath.toFile());
+
+            System.out.println("Excel file saved at: " + filePath.toAbsolutePath());
+
+            // Fetch first 1000 visitors
+            List<Visitor> first1000 = visitorRepository.findTop1000ByOrderByTimestampAsc();
+
+            if (!first1000.isEmpty()) {
+
+                // Delete image files first
+                for (Visitor visitor : first1000) {
+                    String photoPath = visitor.getPhoto();
+
+                    if (photoPath != null && !photoPath.isBlank()) {
+                        Path imageFile = Paths.get("C:/dict_log/images/").resolve(photoPath);
+                        try {
+                            Files.deleteIfExists(imageFile);
+                            System.out.println("Deleted image: " + imageFile);
+                        } catch (IOException e) {
+                            // Do NOT stop the process if one image fails
+                            System.err.println("Failed to delete image: " + imageFile);
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                // Delete visitors from database
+                visitorRepository.deleteAll(first1000);
+                System.out.println("Deleted first 1000 visitors and their images.");
+            }
+
+            return ResponseEntity.ok(
+                "Excel uploaded. First 1000 visitors and images deleted successfully."
+            );
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500)
+                .body("Failed to save Excel or delete visitor data.");
+        }
+    }
+
 }
