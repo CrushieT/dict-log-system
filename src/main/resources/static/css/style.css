@@ -9,7 +9,7 @@
 
     .card {
       position: relative;
-      width: 380px;
+      width: 500px;
       border-radius: 16px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
       text-align: center;
@@ -40,9 +40,19 @@
       min-width: 160px;
     }
 
+    /* Center everything inside the card (already text-align: center, good) */
     .logo {
-      width: 200px;
-      margin-top: 30px;
+        width: 400px;         /* slightly bigger */
+        max-width: 90%;       /* responsive on smaller screens */
+        height: auto;         /* maintain aspect ratio */
+        margin: 30px auto 20px auto; /* top 30px, bottom 20px, centered horizontally */
+        display: block;       /* ensures margin auto works */
     }
+
+    h5 {
+        margin-top: 15px;     /* spacing between logo and title */
+        font-size: 1.2rem;    /* slightly larger text if needed */
+    }
+
 
     
